@@ -7,20 +7,13 @@ import (
 	"os"
 )
 
-type Config struct {
-	Addr      string
-	StaticDir string
-}
-
 type application struct {
 	errorLog *log.Logger
 	infoLog *log.Logger
 }
 
 func main() {
-	config := new(Config)
-	flag.StringVar(&config.Addr, "addr", "4000", "HTTP network address")
-	flag.StringVar(&config.StaticDir, "static-dir", "./ui/static/", "Path to static assets")
+	addr := flag.String("addr", "4000", "HTTP network address")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO:\t", log.Ldate|log.Ltime)
@@ -31,20 +24,12 @@ func main() {
 		infoLog: infoLog,
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/snippet", app.showSnippet)
-	mux.HandleFunc("/snippet/create", app.createSnippet)
-
-	fileServer := http.FileServer(http.Dir(config.StaticDir))
-	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
-
 	server := http.Server{
-		Addr: ":" + config.Addr,
+		Addr: ":" + *addr,
 		ErrorLog: errorLog,
-		Handler: mux,
+		Handler: app.routes(),
 	}
-	infoLog.Printf("Starting server on http://localhost:%s", config.Addr)
+	infoLog.Printf("Starting server on http://localhost:%s", *addr)
 	err := server.ListenAndServe()
 	errorLog.Fatal(err)
 }
