@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func (app *application) home(writer http.ResponseWriter, request *http.Request)  {
+func (app *application) home(writer http.ResponseWriter, request *http.Request) {
 	if request.URL.Path != "/" {
 		app.notFound(writer)
 		return
@@ -29,7 +29,7 @@ func (app *application) home(writer http.ResponseWriter, request *http.Request) 
 	}
 }
 
-func (app *application) showSnippet(writer http.ResponseWriter, request *http.Request)  {
+func (app *application) showSnippet(writer http.ResponseWriter, request *http.Request) {
 	id, err := strconv.Atoi(request.URL.Query().Get("id"))
 	if err != nil {
 		app.notFound(writer)
@@ -39,7 +39,7 @@ func (app *application) showSnippet(writer http.ResponseWriter, request *http.Re
 	fmt.Fprintf(writer, "Display a specific snippet with ID %d...", id)
 }
 
-func (app *application) createSnippet(writer http.ResponseWriter, request *http.Request)  {
+func (app *application) createSnippet(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != http.MethodPost {
 		writer.Header().Set("Allow", http.MethodPost)
 		app.clientError(writer, http.StatusMethodNotAllowed)
