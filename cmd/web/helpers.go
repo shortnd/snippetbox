@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 )
 
 // The serverError helper writes an error message and stack trace to the errorLog,
@@ -37,18 +38,23 @@ func (app *application) render(writer http.ResponseWriter, request *http.Request
 	}
 	buf := new(bytes.Buffer)
 
-	err := ts.Execute(buf, td)
+	err := ts.Execute(buf, app.addDefaultDate(td, request))
 	if err != nil {
 		app.serverError(writer, err)
+		return
 	}
 
 	_, err = buf.WriteTo(writer)
 	if err != nil {
 		app.serverError(writer, err)
+		return
 	}
+}
 
-	err = ts.Execute(writer, td)
-	if err != nil {
-		app.serverError(writer, err)
+func (app *application) addDefaultDate(td *templateData, request *http.Request) *templateData {
+	if td == nil {
+		td = &templateData{}
 	}
+	td.CurrentYear = time.Now().Year()
+	return td
 }
