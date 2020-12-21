@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/shortnd/snippetbox/pkg/models"
+	"html/template"
 	"net/http"
 	"strconv"
 )
@@ -19,25 +20,24 @@ func (app *application) home(writer http.ResponseWriter, request *http.Request) 
 		return
 	}
 
-	for _, snippet := range s {
-		fmt.Fprintf(writer, "%v\n", snippet)
+	data := &templateData{
+		Snippets: s,
 	}
 
-	//return json.NewEncoder(writer).Encode(snippets)
-	//files := []string{
-	//	"./ui/html/home.page.tmpl",
-	//	"./ui/html/base.layout.tmpl",
-	//	"./ui/html/footer.partial.tmpl",
-	//}
-	//ts, err := template.ParseFiles(files...)
-	//if err != nil {
-	//	app.serverError(writer, err)
-	//	return
-	//}
-	//err = ts.Execute(writer, nil)
-	//if err != nil {
-	//	app.serverError(writer, err)
-	//}
+	files := []string{
+		"./ui/html/home.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(writer, err)
+		return
+	}
+	err = ts.Execute(writer, data)
+	if err != nil {
+		app.serverError(writer, err)
+	}
 }
 
 func (app *application) showSnippet(writer http.ResponseWriter, request *http.Request) {
@@ -56,7 +56,27 @@ func (app *application) showSnippet(writer http.ResponseWriter, request *http.Re
 		}
 		return
 	}
-	fmt.Fprintf(writer, "%v", s)
+
+	data := &templateData{Snippet: s}
+
+	// Initialize a slice containing the paths to the show.page.tmpl file,
+	// plus the base layout and footer partial that we made earlier.
+	files := []string{
+		"./ui/html/show.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(writer, err)
+		return
+	}
+
+	err = ts.Execute(writer, data)
+	if err != nil {
+		app.serverError(writer, err)
+	}
 }
 
 func (app *application) createSnippet(writer http.ResponseWriter, request *http.Request) {
