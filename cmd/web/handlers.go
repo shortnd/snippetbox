@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/shortnd/snippetbox/pkg/forms"
 	"github.com/shortnd/snippetbox/pkg/models"
 	"net/http"
 	"strconv"
@@ -43,15 +44,29 @@ func (app *application) showSnippet(writer http.ResponseWriter, request *http.Re
 }
 
 func (app *application) createSnippetForm(writer http.ResponseWriter, request *http.Request) {
-	writer.Write([]byte("Create a new snippet..."))
+	app.render(writer, request, "create.page.tmpl", &templateData{
+		Form: forms.New(nil),
+	})
 }
 
 func (app *application) createSnippet(writer http.ResponseWriter, request *http.Request) {
-	title := "0 snail"
-	content := "0 snail\nClimb Mount Fuji,\nBut slowly, slowly!,\n\n-Kobayashi Issa"
-	expires := "7"
+	err := request.ParseForm()
+	if err != nil {
+		app.clientError(writer, http.StatusBadRequest)
+		return
+	}
+	form := forms.New(request.PostForm)
+	form.Required("title", "content", "expires")
+	form.MaxLength("title", 100)
+	form.PermittedValues("expires", "365", "7", "1")
 
-	id, err := app.snippets.Insert(title, content, expires)
+	if !form.Valid() {
+		app.render(writer, request, "create.page.tmpl", &templateData{
+			Form: form,
+		})
+	}
+
+	id, err := app.snippets.Insert(form.Get("title"), form.Get("content"), form.Get("expires"))
 	if err != nil {
 		app.serverError(writer, err)
 		return
