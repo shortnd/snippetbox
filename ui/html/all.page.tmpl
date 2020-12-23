@@ -1,0 +1,31 @@
+{{ template "base" . }}
+
+{{ define "title" }}All Snippets{{end}}
+
+{{ define "main" }}
+    <h2>All Snippets</h2>
+    {{if .Snippets}}
+        <table>
+            <tr>
+                <th>Title</th>
+                <th>Created</th>
+                <th>ID</th>
+            </tr>
+            {{ range .Snippets }}
+                <tr>
+                    <td>
+                        <a href="/snippet/{{.ID}}">{{.Title}}</a>
+                    </td>
+                    <td>
+                        {{humanDate .Created}}
+                    </td>
+                    <td>
+                        #{{.ID}}
+                    </td>
+                </tr>
+            {{ end }}
+        </table>
+    {{else}}
+        <h3>No Snippets yet...</h3>
+    {{end}}
+{{ end }}
