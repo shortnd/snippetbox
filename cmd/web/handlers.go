@@ -13,6 +13,7 @@ func (app *application) home(writer http.ResponseWriter, request *http.Request) 
 		app.notFound(writer)
 		return
 	}
+
 	s, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(writer, err)
