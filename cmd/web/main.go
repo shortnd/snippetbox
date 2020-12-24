@@ -59,9 +59,13 @@ func main() {
 		Addr:     ":" + *addr,
 		ErrorLog: errorLog,
 		Handler:  app.routes(),
+		IdleTimeout: time.Minute,
+		ReadTimeout: 5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 	infoLog.Printf("Starting server on http://localhost:%s", *addr)
-	err = server.ListenAndServe()
+	//err = server.ListenAndServe()
+	err = server.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errorLog.Fatal(err)
 }
 
