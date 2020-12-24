@@ -63,9 +63,19 @@ func (m *SnippetModel) Latest() ([]*models.Snippet, error) {
 	return snippets, nil
 }
 
-func (m *SnippetModel) All() ([]*models.Snippet, error) {
-	stmt := `SELECT id, title, content, created, expires FROM snippets WHERE expires > UTC_TIMESTAMP() ORDER BY created DESC`
-	rows, err := m.DB.Query(stmt)
+func (m *SnippetModel) All(page int) ([]*models.Snippet, error) {
+	var args []interface{}
+	skip := 0
+	limit := 10
+	if page > 1 {
+		skip = 10 * page
+		limit = (10 * page) + 10
+	}
+	args = append(args, skip)
+	args = append(args, limit)
+
+	stmt := `SELECT id, title, content, created, expires FROM snippets WHERE expires > UTC_TIMESTAMP() ORDER BY created DESC LIMIT ?, ?`
+	rows, err := m.DB.Query(stmt, args...)
 	if err != nil {
 		return nil, err
 	}

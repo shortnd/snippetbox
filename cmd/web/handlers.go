@@ -22,13 +22,19 @@ func (app *application) home(writer http.ResponseWriter, request *http.Request) 
 }
 
 func (app *application) all(writer http.ResponseWriter, request *http.Request) {
-	s, err := app.snippets.All()
+	query := request.URL.Query()
+	page, _ := strconv.Atoi(query.Get("page"))
+	//fmt.Printf("%d", page)
+	if page == 0 {
+		page = 1
+	}
+	s, err := app.snippets.All(page)
 	if err != nil {
 		app.serverError(writer, err)
 		return
 	}
 
-	app.render(writer, request,"all.page.tmpl", &templateData{
+	app.render(writer, request, "all.page.tmpl", &templateData{
 		Snippets: s,
 	})
 }

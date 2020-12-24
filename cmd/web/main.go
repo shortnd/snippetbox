@@ -18,7 +18,7 @@ import (
 type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
-	session *sessions.Session
+	session       *sessions.Session
 	snippets      *mysql.SnippetModel
 	templateCache map[string]*template.Template
 }
@@ -50,7 +50,7 @@ func main() {
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
-		session: session,
+		session:       session,
 		snippets:      &mysql.SnippetModel{DB: db},
 		templateCache: templateCache,
 	}
