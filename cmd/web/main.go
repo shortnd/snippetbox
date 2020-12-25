@@ -20,6 +20,7 @@ type application struct {
 	infoLog       *log.Logger
 	session       *sessions.Session
 	snippets      *mysql.SnippetModel
+	users         *mysql.UserModel
 	templateCache map[string]*template.Template
 }
 
@@ -52,15 +53,16 @@ func main() {
 		infoLog:       infoLog,
 		session:       session,
 		snippets:      &mysql.SnippetModel{DB: db},
+		users:         &mysql.UserModel{DB: db},
 		templateCache: templateCache,
 	}
 
 	server := http.Server{
-		Addr:     ":" + *addr,
-		ErrorLog: errorLog,
-		Handler:  app.routes(),
-		IdleTimeout: time.Minute,
-		ReadTimeout: 5 * time.Second,
+		Addr:         ":" + *addr,
+		ErrorLog:     errorLog,
+		Handler:      app.routes(),
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
 	infoLog.Printf("Starting server on http://localhost:%s", *addr)
